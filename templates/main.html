@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARCHIVE MOSAIC</title>
+  <script src="https://kit.fontawesome.com/d52bfcc17d.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    .main {
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Navigation styling */
+    nav {
+      display: flex;
+      justify-content: center;
+      background:rgb(190, 81, 27); /* Saffron Red */
+      padding: 1rem 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.3rem;
+      margin: 0 20px;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      background: #f28d3b; /* Lighter orange */
+    }
+
+    /* Header and image section */
+    .picture {
+      height: 80vh;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    img {
+      display: block;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      filter: brightness(60%);
+    }
+
+    .heading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 4rem;
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    /* Footer */
+    footer {
+      background: #4c3c24; /* Dark brown */
+      color: #fff;
+      padding: 1.5rem 0;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .heading {
+        font-size: 2.5rem;
+      }
+
+      nav a {
+        font-size: 1rem;
+        margin: 0 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <!-- Navigation bar -->
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#explore">Explore</a>
+      <a href="#aboutus">About us</a>
+      <a href="/signin">SIGN IN</a>
+    </nav>
+
+    <!-- Picture section -->
+    <div class="picture">
+      <img src="/static/images/background.jpeg" alt="Construction Site at Sunset">
+      <div class="heading">
+        <h1>ARCHIVE MOSAIC</h1>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 Archive Mosaic. All Rights Reserved.</p>
+    </footer>
+  </div>
+</body>
+</html>
