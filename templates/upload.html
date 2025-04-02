@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload System</title>
+    <link rel ="stylesheet" href="/static/css/upload.css">
+
+</head>
+<body>
+    <div class="navbar">
+        <a href="#">Home</a>
+        <a href="#">Upload</a>
+        <a href="#">Gallery</a>
+        <a href="#">Contact</a>
+    </div>
+
+    <div class="upload-container">
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+            <p id="fileName">📂 Click to Upload Files</p>
+        </div>
+        <input type="file" id="fileInput" multiple hidden onchange="updateFileName()">
+        <button onclick="uploadFile()">Upload</button>
+        <p id="uploadMessage">File Uploaded✅</p>
+        <div class="file-preview" id="fileList"></div>
+
+        <div class="metadata-form">
+            <label>Title</label>
+            <input type="text" placeholder="Enter title here">
+            
+            <label>Brief Description</label>
+            <textarea placeholder="Describe the material you are uploading"></textarea>
+
+            <label>Date of Uploading</label>
+            <input type="text" value="" id="uploadDate" readonly>
+
+            <label>Language</label>
+            <input type="text" placeholder="Enter language">
+
+            <label>State (if any)</label>
+            <input type="text" placeholder="Enter state affiliation">
+
+            <label>User Uploading</label>
+            <input type="text" value="Guest User" readonly>
+
+            <label>Author (if applicable)</label>
+            <input type="text" placeholder="Enter author name">
+
+            <label>Subject Tags (max 10)</label>
+            <input type="text" placeholder="Add relevant tags">
+        </div>
+    </div>
+</body>
+</html>
