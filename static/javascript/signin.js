@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
 import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+import { getIdTokenResult } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -36,22 +37,49 @@ submitSignIn.addEventListener("click", function (event) {
   const email = signInEmailInput.value;
   const password = document.getElementById('password').value;
 
-  // Sign in existing users
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in successfully
-      const user = userCredential.user;
-      alert("Successfully signed in...");
-      console.log("User signed in:", user);
+// After successful login
+signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    const user = userCredential.user;
+    alert("Successfully signed in...");
 
-      window.location.href = "/upload"; // Redirect to upload page
+    // Get ID token result (includes custom claims like role)
+    return user.getIdTokenResult();
+  })
+  .then((idTokenResult) => {
+    const role = idTokenResult.claims.role || "user";
+    console.log("Custom Role:", role);
+
+    // Send token to Flask to create session
+    return fetch('/sessionLogin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ idToken: idTokenResult.token })
     })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      alert(`Error: ${errorMessage}`); // Corrected alert to display the error message
-      console.log("Error during sign in:", errorCode, errorMessage);
+    .then((res) => {
+      if (!res.ok) throw new Error("Session login failed");
+      return role;
     });
+  })
+
+  .then((role) => {
+    // Redirect based on role after backend session is set
+    if (role === "admin") {
+      sessionStorage.setItem("welcomeMessage", "Welcome, Admin Meenakshi!");
+      window.location.href = "/admin_dashboard";
+    } else {
+      sessionStorage.setItem("welcomeMessage", "Welcome to the Archive Mosaic Platform!");
+      window.location.href = "/upload";
+    }
+  })
+  .catch((error) => {
+    const errorCode = error.code || "";
+    const errorMessage = error.message || "Unknown error";
+    alert(`Error: ${errorMessage}`);
+    console.log("Error during sign in:", errorCode, errorMessage);
+  });
 });
 
 // Forgot Password Button Event Listener
