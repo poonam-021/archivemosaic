@@ -54,3 +54,4 @@
        console.log("Error during signup:", errorCode, errorMessage);
       });
     })
+
