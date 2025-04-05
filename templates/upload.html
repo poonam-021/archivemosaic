@@ -50,5 +50,122 @@
             <input type="text" placeholder="Add relevant tags">
         </div>
     </div>
+    <script>
+        const API_URL = "http://127.0.0.1:5000";
+        
+        // Set current date in the upload date field
+        window.onload = function() {
+            const today = new Date();
+            document.getElementById("uploadDate").value = today.toLocaleDateString();
+            loadFiles();
+        };
+        
+        function updateFileName() {
+            const fileInput = document.getElementById("fileInput");
+            const fileName = document.getElementById("fileName");
+            if (fileInput.files.length > 0) {
+                fileName.textContent = fileInput.files[0].name;
+            } else {
+                fileName.textContent = "📂 Click to Upload Files";
+            }
+        }
+        
+        async function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            const uploadMessage = document.getElementById("uploadMessage");
+
+            if (!fileInput.files.length) {
+                alert("Please select a file!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const response = await fetch(${API_URL}/files/upload, {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert("File uploaded successfully!");
+                    uploadMessage.style.display = "block";
+                    loadFiles();  // Load files after upload
+                } else {
+                    alert("Upload failed");
+                }
+            } catch (error) {
+                console.error("Error uploading file:", error);
+            }
+        }
+
+        async function loadFiles() {
+            const fileList = document.getElementById("fileList");
+            fileList.innerHTML = "";
+
+            try {
+                const response = await fetch(${API_URL}/files/list);
+                const files = await response.json();
+
+                files.forEach(file => {
+                    const div = document.createElement("div");
+
+                    let preview = "";
+                    if (file.filename.toLowerCase().endsWith(".jpg") || 
+                        file.filename.toLowerCase().endsWith(".png") || 
+                        file.filename.toLowerCase().endsWith(".gif")) {
+                        preview = <img src="${API_URL}/download/${file.file_id}" class="image-preview" alt="image preview"/>;
+                    } else if (file.filename.toLowerCase().endsWith(".mp4") || 
+                               file.filename.toLowerCase().endsWith(".avi") || 
+                               file.filename.toLowerCase().endsWith(".mov")) {
+                        preview = `<video class="video-preview" controls>
+                                    <source src="${API_URL}/download/${file.file_id}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                  </video>`;
+                    }
+
+                    div.innerHTML = `
+                        <div>
+                            ${preview}
+                            <p>${file.filename}</p>
+                            <button onclick="downloadFile('${file.file_id}')">Download</button>
+                            <button onclick="deleteFile('${file.file_id}')">Delete</button>
+                        </div>
+                    `;
+
+                    fileList.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Error fetching file list:", error);
+            }
+        }
+
+        async function deleteFile(fileId) {
+            if (!confirm("Are you sure you want to delete this file?")) return;
+
+            try {
+                const response = await fetch(${API_URL}/files/delete/${fileId}, {
+                    method: "DELETE",
+                });
+
+                if (response.ok) {
+                    alert("File deleted successfully!");
+                    loadFiles();
+                } else {
+                    alert("Deletion failed");
+                }
+            } catch (error) {
+                console.error("Error deleting file:", error);
+            }
+        }
+
+        function downloadFile(fileId) {
+            window.location.href = ${API_URL}/files/download/${fileId};
+        }
+
+        window.onload = loadFiles;
+
+    </script>
 </body>
 </html>
