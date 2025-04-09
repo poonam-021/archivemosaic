@@ -244,7 +244,23 @@ def delete_file(file_id):
 def list_files():
     files = mongo.db['fs.files'].find({}, {"_id": 1, "filename": 1})
     file_list = [{"file_id": str(file["_id"]), "filename": file["filename"]} for file in files]
-    return jsonify(file_list), 200      
+    return jsonify(file_list), 200
+    
+@app.route('/files/post', methods=['POST'])
+def upload_with_metadata():
+    file = request.files['file']
+    metadata = {
+        "title": request.form.get("title"),
+        "description": request.form.get("description"),
+        "date": request.form.get("date"),
+        "language": request.form.get("language"),
+        "state": request.form.get("state"),
+        "user": request.form.get("user"),
+        "author": request.form.get("author"),
+        "tags": request.form.get("tags")
+    }
+    file_id = fs.put(file, filename=file.filename, metadata=metadata)
+    return jsonify({"file_id": str(file_id)}), 200
 # Run the app
 if __name__ == "__main__":
     app.run(debug=True)
