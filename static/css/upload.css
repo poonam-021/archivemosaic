@@ -97,7 +97,8 @@ body::before {
     justify-content: center;
 }
 .file-preview div {
-    background: #fff;
+    background: #f3f0f0;
+    color:#333;
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -128,7 +129,7 @@ body::before {
     border: 2px solid #6a11cb;
     border-radius: 10px;
     font-size: 16px;
-    background: #fff;
+    background: #fefcfc;
 }
 .metadata-form textarea {
     height: 80px;
@@ -138,7 +139,7 @@ body::before {
 /* Upload Message */
 #uploadMessage {
     display: none;
-    color: green;
+    color: rgb(1, 15, 1);
     font-weight: bold;
     margin-top: 10px;
     font-size: 18px;
@@ -188,4 +189,25 @@ button:hover {
     }
 }
 
-ye upload.css hai
+#uploadMessage {
+    display: none;
+    color: green;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  
+  button {
+    background: #6a11cb;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 15px;
+  }
+  button:hover {
+    background: #5209a0;
+  }
+  
