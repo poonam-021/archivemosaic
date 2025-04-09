@@ -1,6 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file, session
 from flask_bcrypt import Bcrypt
-#from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_pymongo import PyMongo
 import gridfs
@@ -16,8 +15,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 
 bcrypt = Bcrypt(app)
-#login_manager = LoginManager(app)
-#login_manager.login_view = "signin"
 
 # Initialize Firebase Admin SDK
 cred = credentials.Certificate("serviceAccountKey.json")
@@ -28,7 +25,6 @@ firebase_admin.initialize_app(cred)
 def home():
     return render_template('main.html')
 
-# Sign up route
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -56,8 +52,6 @@ def signup():
 
     return render_template('signup.html')
 
-
-# Sign in route
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
@@ -89,7 +83,6 @@ def signin():
 
     return render_template('signin.html')
 
-# Password Reset Route
 @app.route('/reset_password', methods=['POST'])
 def reset_password():
     email = request.form['email']
@@ -103,7 +96,6 @@ def reset_password():
 
     return redirect(url_for('signin'))
 
-# Logout route
 @app.route('/logout')
 #@login_required
 def logout():
@@ -188,6 +180,7 @@ def check_my_role():
         })
     except Exception as e:
         return jsonify({"error": str(e)})
+        
 # Make sure CORS is imported if needed
 from flask_cors import CORS
 CORS(app, origins=["http://127.0.0.1:5500"])  # Enable CORS if you have cross-origin requests
@@ -211,16 +204,30 @@ def upload_page():
     return render_template('upload.html')
 
 # File Handling Routes
-@app.route('/files/upload', methods=['POST'])
+@app.route('/files/upload', methods=['POST','GET'])
 def upload_file():
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
+    
     file = request.files['file']
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
+
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file_id = fs.put(file, filename=filename, content_type=file.content_type)
+        # Extract metadata
+        user_id = g.user['uid']  # From Firebase token verification
+        upload_date = datetime.utcnow()
+        content_type = file.content_type
+
+        # Save to GridFS with metadata
+        fs = gridfs.GridFS(mongo.db)
+
+        file_id = fs.put(file, filename=filename, content_type=file.content_type, user_id=session.get("user_id"),metadata={
+                'userId': user_id,
+                'uploadDate': upload_date,
+                'originalName': filename
+            })
         return jsonify({"message": "File uploaded successfully", "file_id": str(file_id)}), 201
     return jsonify({"error": "File type not allowed"}), 400
 
