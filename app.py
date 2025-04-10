@@ -6,7 +6,9 @@ import gridfs
 from werkzeug.utils import secure_filename
 from bson import ObjectId
 from io import BytesIO
-
+from collections import defaultdict
+from datetime import datetime
+from functools import wraps
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 
@@ -111,13 +113,11 @@ def session_login():
     try:
         decoded_token = auth.verify_id_token(id_token)
         role = decoded_token.get("role", "user")
-
         # Store role and email in session
         session['user_role'] = role
         session['email'] = decoded_token.get('email')
 
         return jsonify({"message": "Session set", "role": role}), 200
-
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -135,11 +135,9 @@ def get_all_users():
     
     user_list = []
     for user in users:
-
         # Ensure claims exist before accessing (the code will not crash of a user has no role assigned)
         claims = user.custom_claims if user.custom_claims else {}
         role = claims.get("role", "user")  # Default role is "user"
-
         user_list.append({
             "uid": user.uid,
             "email": user.email,
@@ -167,19 +165,50 @@ def delete_user(uid):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@app.route('/check_my_role')
-def check_my_role():
-    try:
-        email = "meenakshi16rp@gmail.com"
-        user = auth.get_user_by_email(email)
-        claims = user.custom_claims if user.custom_claims else {}
-        return jsonify({
-            "email": user.email,
-            "role": claims.get("role", "No role set"),
-            "claims": claims
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)})
+from together import Together
+import base64
+import tempfile
+
+client = Together(api_key="51df07beb081982c5b1a919b3f91662e2a5b322211ec358b79bc7135d914fede")  # Use your actual key
+
+@app.route("/analyze-image", methods=["POST"])
+def analyze_image():
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files["file"]
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
+        file.save(temp_file.name)
+        with open(temp_file.name, "rb") as image_file:
+            image_bytes = image_file.read()
+            image_base64 = base64.b64encode(image_bytes).decode()
+
+    prompt = """The user will provide images mostly related to Indian monuments, Indian dances, Indian art, Indian historical figures.
+    Analyze the image and give one word output for the thing in the image. If it's a monument then just tell the name of the monument and its location and nothing else.
+    If the image depicts a dance then just give the name of the dance and nothing else. If the image depicts a potrait of a person then just give the name of the figure
+    and nothing else. Keep the response as just the name of the thing depicted in the image and no extra text."""
+
+    response = client.chat.completions.create(
+        model="meta-llama/Llama-Vision-Free",
+        messages=[
+            {"role": "user", "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}}
+            ]}
+        ],
+        max_tokens=50,
+        temperature=0.7,
+        top_p=0.7,
+        top_k=50,
+        repetition_penalty=1,
+        stop=["<|eot_id|>", "<|eom_id|>"],
+        stream=False
+    )
+
+    description = response.choices[0].message.content.strip()
+    return jsonify({"description": description})
+
         
 # Make sure CORS is imported if needed
 from flask_cors import CORS
