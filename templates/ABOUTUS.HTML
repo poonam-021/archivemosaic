@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us | Digital Cultural Archiving</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="aboutus.css">  
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">Archive Mosaic</div>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#explore">Explore</a>
+      <a href="#aboutus">About Us</a>
+      <a href="/signin">SIGN IN</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <section class="section">
+      <h2>Our Mission</h2>
+      <p>Our mission is to digitally archive and preserve cultural data from across India, ensuring its accessibility for future generations. Through digital tools, we strive to protect cultural heritage and make it available globally for educational and research purposes.</p>
+    </section>
+
+    <section class="section">
+      <h2>Our Vision</h2>
+      <p>We envision a world where all cultural data is digitized and easily accessible to anyone, anywhere. By making cultural knowledge accessible, we aim to foster greater understanding, appreciation, and celebration of humanity's diverse histories.</p>
+    </section>
+
+    <section class="section">
+      <h2>Core Values</h2>
+      <ul>
+        <li><span class="highlight">Integrity:</span> We maintain the authenticity and accuracy of cultural data during its digital preservation process.</li>
+        <li><span class="highlight">Accessibility:</span> We believe in making cultural data available to all, ensuring no heritage is excluded from the digital era.</li>
+        <li><span class="highlight">Inclusivity:</span> We celebrate the richness of all cultures, ensuring that no culture, language, or tradition is overlooked.</li>
+        <li><span class="highlight">Innovation:</span> We continuously embrace cutting-edge technologies and innovative methods to preserve, protect, and share cultural knowledge.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Website Overview</h2>
+      <p>This Website is dedicated to digitalizing cultural data—whether it's historical documents, oral histories, or traditional artifacts. By creating digital archives, we help safeguard cultural heritage from physical decay while promoting its global dissemination for educational and research purposes.</p>
+    </section>
+
+    <section class="section">
+      <h2>Meet Our Team</h2>
+      <div class="team-members">
+        <div class="team-member">
+          <img src="team-member1.jpg" alt="Team Member 1">
+          <h3>John Doe</h3>
+          <p><strong>Project Lead</strong><br>Expert in Cultural Preservation, overseeing the project's strategy and implementation.</p>
+        </div>
+        <div class="team-member">
+          <img src="team-member2.jpg" alt="Team Member 2">
+          <h3>Jane Smith</h3>
+          <p><strong>Software Engineer</strong><br>Responsible for building the archiving system.</p>
+        </div>
+        <div class="team-member">
+          <img src="team-member3.jpg" alt="Team Member 3">
+          <h3>Emily Johnson</h3>
+          <p><strong>Cultural Consultant</strong><br>Ensures cultural accuracy and depth in all uploads.</p>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <h2>Uploading – A Basic Guide</h2>
+      <p>You will need a to register for a free account on archivemosaic before you can upload. <br>
+        If you would like to do so now, click on this link: <a href="signup.html">Free account</a> to be redirected.
+        <h4>What files can I upload?</h4>
+        By having a free account, you will be able to upload files such as music and audio recordings; videos, software and images, and much more.     
+        
+        
+        <h4>What file formats should I use to upload?</h4>
+        To ensure quality and consistency, our platform currently supports uploads in the following formats: PDF, JPEG, MP3, DOCX, and IMG. These formats help us maintain accessibility and preserve cultural content effectively.        
+        </p>
+       
+    </section>
+
+    <section class="section">
+      <h2>Why Digital Archiving?</h2>
+      <p>Digital archiving ensures long-term preservation and accessibility of cultural heritage. It safeguards against physical degradation and provides an educational bridge across generations, communities, and continents.</p>
+    </section>  
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Archive Mosaic | Contact: info@digitarchiving.com</p>
+  </footer>
+
+  <!-- Fade-in Animation Script -->
+  <script>
+    const sections = document.querySelectorAll('.section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+  </script>
+</body>
+</html>
