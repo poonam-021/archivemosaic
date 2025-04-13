@@ -209,7 +209,91 @@ def analyze_image():
     description = response.choices[0].message.content.strip()
     return jsonify({"description": description})
 
-        
+ 
+@app.route('/get_user_uploads/<uid>', methods=['GET'])
+def get_user_uploads(uid):
+    try:
+        # Assuming each file has a 'user_id' field when uploaded
+        files = mongo.db['fs.files'].find({"user_id": uid})
+        uploads = []
+        for file in files:
+            uploads.append({
+                "file_id": str(file["_id"]),
+                "filename": file["filename"],
+                "content_type": file.get("contentType", "unknown"),
+                "upload_date": file.get("uploadDate", ""),
+            })
+        return jsonify(uploads)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/file/preview/<file_id>', methods=['GET'])
+def preview_file(file_id):
+    try:
+        file = fs.get(ObjectId(file_id))
+        return send_file(BytesIO(file.read()), mimetype=file.content_type)
+    except Exception:
+        return jsonify({"error": "File not found"}), 404
+
+@app.route('/analytics/uploads_over_time', methods=['GET'])
+def uploads_over_time():
+    uploads = list(mongo.db['fs.files'].find({}, {"uploadDate": 1, "userId": 1}))
+
+    # Group data
+    upload_counts = defaultdict(lambda: defaultdict(int))
+    for upload in uploads:
+        user = upload.get("userId", "unknown")
+        date = upload.get("uploadDate")
+        if isinstance(date, datetime):
+            date_str = date.date().isoformat()
+        else:
+            try:
+                date_str = datetime.fromisoformat(str(date)).date().isoformat()
+            except:
+                continue
+        upload_counts[user][date_str] += 1
+
+    # Get sorted dates and format datasets
+    all_dates = sorted(set(date for user_data in upload_counts.values() for date in user_data))
+    datasets = []
+    import random
+
+    for user, date_data in upload_counts.items():
+        data = [date_data.get(date, 0) for date in all_dates]
+        color = f"rgb({random.randint(50,200)}, {random.randint(50,200)}, {random.randint(50,200)})"
+        datasets.append({
+            "label": user,
+            "data": data,
+            "borderColor": color,
+            "backgroundColor": color,
+            "fill": False
+        })
+
+    return jsonify({
+        "labels": all_dates,
+        "datasets": datasets
+    })
+
+def verify_firebase_token(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        id_token = request.headers.get("Authorization")
+        if not id_token:
+            return jsonify({"error": "Missing token"}), 401
+
+        try:
+            decoded_token = auth.verify_id_token(id_token)
+            g.user = {
+                "uid": decoded_token["uid"],
+                "email": decoded_token.get("email"),
+                "role": decoded_token.get("role", "user")
+            }
+        except Exception as e:
+            print("Token verification failed:", e)
+            return jsonify({"error": "Invalid token"}), 401
+
+        return func(*args, **kwargs)
+    return wrapper       
 # Make sure CORS is imported if needed
 from flask_cors import CORS
 CORS(app, origins=["http://127.0.0.1:5500"])  # Enable CORS if you have cross-origin requests
