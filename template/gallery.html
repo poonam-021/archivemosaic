@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cultural Gallery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .fade-in.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .zoom-hover:hover img {
+      transform: scale(1.05);
+    }
+    .zoom-hover img {
+      transition: transform 0.5s ease;
+    }
+    .dark-mode {
+      background-color: #1a202c;
+      color: #f7fafc;
+    }
+    .dark-mode .bg-white {
+      background-color: #2d3748;
+    }
+    .dark-mode .text-gray-800 {
+      color: #f7fafc;
+    }
+    .dark-mode .text-gray-600 {
+      color: #e2e8f0;
+    }
+    #page{
+      background-color: white;
+    }
+    h1 p{
+      
+    }
+  </style>
+</head>
+<body class="bg-gray-50 transition duration-500" id="page"> 
+
+  <!-- Header -->
+  <div class="text-center py-10 bg-gradient-to-r from-orange-100 via-yellow-50 to-orange-100 shadow">
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-2">Cultural Gallery</h1>
+    <p class="text-gray-600">A visual archive of our rich traditions and heritage</p>
+    <button onclick="toggleDarkMode()" class="mt-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition">
+      Toggle Dark Mode
+    </button>
+  </div>
+
+  <!-- Gallery Container -->
+  <div class="py-12 px-6 lg:px-20">
+    <div id="loader" class="flex justify-center mb-10">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-orange-500"></div>
+    </div>
+    <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <!-- Images injected by JS -->
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+    <div class="relative max-w-4xl max-h-[90vh]">
+      <button onclick="closeLightbox()" class="absolute top-0 right-0 text-white text-3xl px-4 py-2">×</button>
+      <img id="lightbox-img" src="" alt="Zoomed Cultural Image" class="rounded-lg max-h-[90vh] w-auto mx-auto" />
+      <p id="lightbox-caption" class="text-white mt-4 text-center text-lg"></p>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const gallery = document.getElementById('gallery');
+    const loader = document.getElementById('loader');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+
+    fetch('/api/images') // Update with your API
+      .then(res => res.json())
+      .then(images => {
+        loader.style.display = "none";
+
+        images.forEach((img, index) => {
+          const container = document.createElement('div');
+          container.className = "rounded-xl overflow-hidden shadow-lg bg-white zoom-hover fade-in cursor-pointer";
+          container.onclick = () => openLightbox(img.url, img.title || `Cultural Image ${index + 1}`);
+
+          const image = document.createElement('img');
+          image.src = img.url;
+          image.alt = img.title || `Cultural Image ${index + 1}`;
+          image.className = "w-full h-60 object-cover";
+
+          const caption = document.createElement('p');
+          caption.className = "p-3 text-center text-sm font-medium text-gray-700";
+          caption.innerText = img.title || `Untitled Image`;
+
+          container.appendChild(image);
+          container.appendChild(caption);
+          gallery.appendChild(container);
+
+          setTimeout(() => container.classList.add('show'), index * 100);
+        });
+      })
+      .catch(err => {
+        loader.innerHTML = '<p class="text-red-600">Failed to load images.</p>';
+        console.error('Gallery error:', err);
+      });
+
+    function openLightbox(src, caption = '') {
+      lightboxImg.src = src;
+      lightboxCaption.innerText = caption;
+      lightbox.classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.add('hidden');
+      lightboxImg.src = '';
+      lightboxCaption.innerText = '';
+    }
+
+    function toggleDarkMode() {
+      document.getElementById('page').classList.toggle('dark-mode');
+    }
+  </script>
+
+</body>
+</html>
